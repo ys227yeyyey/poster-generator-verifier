@@ -10,14 +10,15 @@ tools: Read, Write, Edit, Bash
 - `RUN_ID`
 - `ROUND` (current round number)
 - `THEME` (what poster to make: purpose, target audience, etc.)
-- `CRITERIA` (the 3 criteria it will be scored on)
+- `CRITERIA` (the 3 criteria it will be scored on, each as a rubric: Name / Definition / Checks / Anchors for 5, 3, 1)
 - Only when `ROUND >= 2`: `PREV_HTML` (absolute path of the previous round's HTML) and `FEEDBACK` (the full scores and feedback from the previous round's Verifier)
 
 ## Task
 Create a poster that fits `THEME`. When `ROUND >= 2`, Read `PREV_HTML`, use it as the base, and revise it to **address every point** in `FEEDBACK`.
 
 - The final deliverable is a **PNG poster** (fixed). Build it as a single HTML file (1080×1528px portrait, no external images; CSS / inline SVG only; Google Fonts allowed) and convert it to PNG
-- Keep the 3 `CRITERIA` in mind while designing (scoring is **fixed**: exactly 3 criteria, max 5 points each, 15 total)
+- Treat every Check in `CRITERIA` as a requirement and aim for the 5 Anchor of each criterion (scoring is **fixed**: exactly 3 criteria, max 5 points each, 15 total)
+- Before finishing, go through each Check against your own PNG and fix any that fail
 - Do not state uncertain numbers or facts as certain (add qualifiers such as "approx.")
 - All text on the poster must be written in English
 

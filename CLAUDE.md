@@ -21,14 +21,24 @@ Everything runs in English: agent prompts, agent replies, user-facing reports, q
 | Deliverable format | **PNG poster (fixed)** |
 | Number of scoring criteria | **3 criteria, 5 points each, 15 total (fixed)** |
 | THEME (what poster to make) | **Specified by the user on every run** |
-| CRITERIA (content of the 3 criteria) | **Specified by the user on every run** |
+| CRITERIA (content of the 3 criteria) | **Specified by the user on every run, then expanded into a specific rubric (see "CRITERIA rubric format") and confirmed by the user** |
 | PASS_LINE (how a pass is defined, given the 3 fixed criteria × 5 points) | **Asked from the user on every run, right after CRITERIA** (e.g. minimum total, and/or minimum per criterion) |
 | MAX_ROUNDS (maximum iterations) | **Specified by the user on every run** |
 
+## CRITERIA rubric format
+Each of the 3 criteria must be specific enough that two reviewers would give the same score. Every criterion is written as:
+- **Name**: short label
+- **Definition**: one sentence on what is being judged, for this THEME and audience
+- **Checks**: 3–4 observable yes/no items that can be verified by looking at the PNG (e.g. "a concrete price, route, or airline is stated", "no text smaller than ~16px", "CTA has an actionable URL or code")
+- **Anchors**: what 5 / 3 / 1 looks like, in concrete terms (4 and 2 sit in between)
+
+Scoring guide: the score follows from how many Checks pass and which Anchor the poster is closest to. A criterion cannot get 5 unless all its Checks pass.
+
 ## Workflow (run by the Orchestrator)
 0. **Check parameters**: Read THEME, CRITERIA (3 items), PASS_LINE, and MAX_ROUNDS from the request. If any item is missing, ask the user via `AskUserQuestion` (do not fill in by guessing). Also ask if CRITERIA is not exactly 3 items. Ask in this order: CRITERIA first, then PASS_LINE (taking the confirmed 3 criteria into account, e.g. offer total-only vs. total + per-criterion minimum), then MAX_ROUNDS. PASS_LINE is always asked, even if it was the same in a previous run.
+   - **Expand CRITERIA into the rubric**: after the 3 criteria are chosen, draft the Definition / Checks / Anchors for each (in English), show the draft to the user via `AskUserQuestion` (approve or edit), and use the confirmed rubric as `CRITERIA` from then on. If the user already supplied a full rubric, only confirm it.
 1. Issue a `RUN_ID` (`date '+%Y%m%d_%H%M%S'`). `ROUND = 1`.
-2. Launch `poster_generator` with the Agent tool. Pass `RUN_ID / ROUND / THEME / CRITERIA` in the prompt (for ROUND≥2, also pass `PREV_HTML` and the full previous Verifier reply as `FEEDBACK`).
+2. Launch `poster_generator` with the Agent tool. Pass `RUN_ID / ROUND / THEME / CRITERIA` (the full confirmed rubric) in the prompt (for ROUND≥2, also pass `PREV_HTML` and the full previous Verifier reply as `FEEDBACK`).
 3. Confirm the `PNG` path in the reply exists.
 4. Launch `poster_verifier`. Pass `ROUND / THEME / CRITERIA / PASS_LINE / PNG / HTML` in the prompt.
 5. Check `VERDICT` in the reply:
@@ -42,7 +52,7 @@ Everything runs in English: agent prompts, agent replies, user-facing reports, q
 | Agent | Input (launch prompt) | Output (reply) |
 |---|---|---|
 | poster_generator | `RUN_ID / ROUND / THEME / CRITERIA`; for ROUND≥2 also `PREV_HTML / FEEDBACK` | `ROUND / PNG (absolute path) / HTML (absolute path) / CHANGES` (text) |
-| poster_verifier | `ROUND / THEME / CRITERIA / PASS_LINE / PNG / HTML` | `ROUND / SCORES / TOTAL / VERDICT / FEEDBACK` (text) |
+| poster_verifier | `ROUND / THEME / CRITERIA (rubric) / PASS_LINE / PNG / HTML` | `ROUND / SCORES / CHECKS / TOTAL / VERDICT / FEEDBACK` (text) |
 
 ## File structure
 ```
